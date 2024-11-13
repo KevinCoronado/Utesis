@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:100,200,300,400,500,600,700,800,900" rel="stylesheet">
+
+    <title>Grad School HTML5 Template</title>
+    <link href="https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/style.min.css" rel="stylesheet" />
+        <link href="css/styles.css" rel="stylesheet" />
+        <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap core CSS -->
+    <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Additional CSS Files -->
+    <link rel="stylesheet" href="assets/css/fontawesome.css">
+    <link rel="stylesheet" href="assets/css/templatemo-grad-school.css">
+    <link rel="stylesheet" href="assets/css/owl.css">
+    <link rel="stylesheet" href="assets/css/lightbox.css">
+<!--
+    
+TemplateMo 557 Grad School
+
+https://templatemo.com/tm-557-grad-school
+
+-->
+  </head>
+
+<body>
+
+   
+  <!--header-->
+  <header class="main-header clearfix" role="header">
+    <div class="logo">
+      <a href="#"><em>UTE</em>sis</a>
+    </div>
+    <a href="#menu" class="menu-link"><i class="fa fa-bars"></i></a>
+    <nav id="menu" class="main-nav" role="navigation">
+      <ul class="main-menu">
+        <li><a href="#">Alumnos</a></li>
+        <li><a href="#">Mi perfil</a></li>
+      </ul>
+    </nav>
+  </header>
+  <main style="padding-top: 90px;">
+    <div class="container">
+      <h2 class="mb-4">Calificar Visitas Semanales del Alumno</h2>
+      
+      <!-- Formulario para agregar una nueva calificación -->
+      <form id="calificacion-form" action="procesar_informacion.php" method="POST">
+        <div class="form-group">
+          <label for="semana">Semana:</label>
+          <select class="form-control" id="semana" name="semana" required>
+            <option value="" disabled selected>Seleccione la semana</option>
+            <option value="1">Semana 1</option>
+            <option value="2">Semana 2</option>
+            <option value="3">Semana 3</option>
+            <option value="4">Semana 4</option>
+            <option value="5">Semana 5</option>
+            <option value="6">Semana 6</option>
+            <option value="7">Semana 7</option>
+            <option value="8">Semana 8</option>
+            <option value="9">Semana 9</option>
+            <option value="10">Semana 10</option>
+            <option value="11">Semana 11</option>
+            <option value="12">Semana 12</option>
+            <option value="13">Semana 13</option>
+            <option value="14">Semana 14</option>
+            <!-- Agregar más semanas si es necesario -->
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="calificacion">Calificación (0-10):</label>
+          <select class="form-control" id="calificacion" name="calificacion" required>
+            <option value="" disabled selected>Seleccione la calificacion</option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+            <option value="6">6</option>
+            <option value="7">7</option>
+            <option value="8">8</option>
+            <option value="9">9</option>
+            <option value="10">10</option>
+
+            <!-- Agregar más semanas si es necesario -->
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="comentario">Comentario:</label>
+          <textarea class="form-control" id="comentario" name="comentario" rows="3" placeholder="Opcional"></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Guardar Calificación</button>
+      </form>
+      
+      <!-- Tabla de calificaciones ya hechas -->
+      <h3 class="mt-5">Calificaciones Registradas</h3>
+      <table class="table table-striped mt-3">
+        <thead>
+          <tr>
+            <th>Semana</th>
+            <th>Calificación</th>
+            <th>Comentario</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody id="calificaciones-registradas">
+          <!-- Las calificaciones se agregarán aquí desde JavaScript -->
+        </tbody>
+      </table>
+    </div>
+  </main>
+
+  
+  
+  <script>
+
+    // Obtener parámetros de la URL
+const urlParams = new URLSearchParams(window.location.search);
+const id = urlParams.get('id');
+const nombre = urlParams.get('nombre');
+console.log(`ID del alumno: ${id}, Nombre: ${nombre}`);
+
+// Hacer la solicitud para obtener las calificaciones del alumno
+function cargarCalificaciones() {
+fetch(`php/obtener_calificaciones.php?id=${id}`)
+  .then(response => response.json())
+  .then(calificaciones => {
+    console.log(calificaciones)
+    if (calificaciones.error) {
+      console.log(calificaciones.error);
+      return;
+    }
+
+    // Mostrar el nombre del alumno en la página (si es necesario)
+    // Si tienes un elemento donde mostrar el nombre del alumno, puedes hacerlo así:
+    // document.getElementById('nombre-alumno').textContent = `Calificaciones de: ${nombre}`;
+    calificaciones.sort((a, b) => a.semana - b.semana);
+
+    // Mostrar las calificaciones en la tabla
+    const tbody = document.getElementById('calificaciones-registradas');
+    tbody.innerHTML = ''; // Limpiar tabla antes de actualizarla
+
+    if (calificaciones.length > 0) {
+      calificaciones.forEach(calificacion => {
+        const row = document.createElement('tr');
+        row.setAttribute('data-id', calificacion.id);
+        console.log(calificacion.id);
+        row.innerHTML = `
+        <td class="semana">Semana ${calificacion.semana}</td>
+        <td class="calificacion">${calificacion.calificacion}</td>
+        <td class="comentario">${calificacion.comentario}</td>
+        <td class="acciones">
+          <button class="btn btn-warning btn-sm" onclick="editarCalificacion(${calificacion.id})">Editar</button>
+          <button class="btn btn-danger btn-sm" onclick="eliminarCalificacion(${calificacion.id})">Eliminar</button>
+        </td>
+      `;
+        tbody.appendChild(row);
+      });
+    } else {
+      tbody.innerHTML = '<tr><td colspan="4">No hay calificaciones disponibles.</td></tr>';
+    }
+  })
+  .catch(error => {
+    console.error('Error al obtener las calificaciones:', error);
+  });
+}
+
+ // Llamada inicial para cargar las calificaciones al cargar la página
+ cargarCalificaciones();
+
+ function editarCalificacion(id) {
+  // Selecciona la fila donde se encuentra el botón de edición
+  const row = document.querySelector(`tr[data-id='${id}']`);
+  
+  // Obtén las celdas de la fila que contienen los datos
+  const semanaCell = row.querySelector('.semana');
+  const calificacionCell = row.querySelector('.calificacion');
+  const comentarioCell = row.querySelector('.comentario');
+  
+  // Reemplaza el contenido de las celdas con inputs para edición
+  semanaCell.innerHTML = `<input type="number" value="${semanaCell.textContent}" class="form-control" id="edit-semana-${id}" disabled>`;
+  calificacionCell.innerHTML = `<input type="number" step="0.01" value="${calificacionCell.textContent}" class="form-control" id="edit-calificacion-${id}" min="0" max="10">`;
+  comentarioCell.innerHTML = `<textarea class="form-control" id="edit-comentario-${id}">${comentarioCell.textContent}</textarea>`;
+  
+  // Cambia el botón de edición para guardar cambios
+  const accionesCell = row.querySelector('.acciones');
+  accionesCell.innerHTML = `<button class="btn btn-success btn-sm" onclick="guardarEdicion(${id})">Guardar</button>
+                            <button class="btn btn-secondary btn-sm" onclick="cancelarEdicion(${id})">Cancelar</button>`;
+}
+
+// Cancelar edición y restaurar la vista original
+function cancelarEdicion(id) {
+  cargarCalificaciones(); // Vuelve a cargar las calificaciones desde la base de datos para restaurar la tabla
+}
+
+// Guardar edición
+function guardarEdicion(id) {
+  const calificacion = document.getElementById(`edit-calificacion-${id}`).value;
+  const comentario = document.getElementById(`edit-comentario-${id}`).value;
+
+  console.log(id, calificacion, comentario)
+  // Envía los datos al servidor para actualizar
+  fetch(`php/editar_calificacion.php`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+    body: new URLSearchParams({
+      id,
+      calificacion,
+      comentario
+    })
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.success) {
+      alert(data.message);
+      cargarCalificaciones(); // Recarga la tabla
+    } else {
+      alert("Error: " + data.error);
+    }
+  })
+  .catch(error => console.error('Error al guardar la edición:', error));
+}
+
+
+// Función para eliminar una calificación
+function eliminarCalificacion(id) {
+  if (confirm("¿Estás seguro de que deseas eliminar esta calificación?")) {
+    fetch(`php/eliminar_calificacion.php`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: new URLSearchParams({ 'id': id })
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        alert(data.message); // Mensaje de éxito
+        cargarCalificaciones(); // Recargar la tabla
+      } else {
+        alert("Error: " + data.error); // Mostrar mensaje de error
+      }
+    })
+    .catch(error => console.error('Error al eliminar la calificación:', error));
+  }
+}
+
+
+document.getElementById('calificacion-form').addEventListener('submit', function(event) {
+  event.preventDefault(); // Prevenir el envío tradicional del formulario
+
+  const semana = document.getElementById('semana').value;
+  const calificacion = document.getElementById('calificacion').value;
+  const comentario = document.getElementById('comentario').value;
+
+  // Obtener las semanas ya registradas de la tabla
+  const tbody = document.getElementById('calificaciones-registradas');
+  const semanasRegistradas = Array.from(tbody.querySelectorAll('td:first-child')).map(td =>
+    td.textContent.replace('Semana ', '').trim()
+  );
+
+  // Validar si la semana ya está registrada
+  if (semanasRegistradas.includes(semana)) {
+    alert(`La semana ${semana} ya está registrada. Por favor, elige otra semana.`);
+    return; // Detener el proceso de registro si ya existe
+  }
+
+
+  
+  // Enviar los datos con fetch
+  fetch('php/procesar_informacion.php?id=' + id, {
+      method: 'POST',
+      body: new URLSearchParams({
+          'semana': semana,
+          'calificacion': calificacion,
+          'comentario': comentario
+      })
+  })
+  .then(response => response.json())
+  .then(data => {
+      if (data.success) {
+          alert(data.success);
+          cargarCalificaciones(); // Llamar a la función para actualizar la tabla
+
+          // Opcionalmente, puedes actualizar la tabla de calificaciones aquí
+      } else {
+          alert(data.error);
+      }
+  })
+  .catch(error => console.error('Error al registrar la calificación:', error));
+});
+
+  </script>
+  
+  <footer>
+    <div class="container">
+      <div class="row">
+        <div class="col-md-12">
+          <p><i class="fa fa-copyright"></i> Copyright 2024 by 2 hombres y medio  
+          
+           </a></p>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <!-- Bootstrap core JavaScript -->
+    <script src="vendor/jquery/jquery.min.js"></script>
+    <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+    <script src="assets/js/isotope.min.js"></script>
+    <script src="assets/js/owl-carousel.js"></script>
+    <script src="assets/js/lightbox.js"></script>
+    <script src="assets/js/tabs.js"></script>
+    <script src="assets/js/video.js"></script>
+    <script src="assets/js/slick-slider.js"></script>
+    <script src="assets/js/custom.js"></script>
+    
+</body>
+</html>
