@@ -1,0 +1,80 @@
+CREATE DATABASE utesis;
+USE utesis;
+
+-- Tabla de roles
+CREATE TABLE rol (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    nombre_rol VARCHAR(50) NOT NULL
+);
+
+-- Insertando roles básicos
+INSERT INTO rol (nombre_rol) VALUES ('estudiante'), ('asesor'), ('admin');
+
+-- Tabla de asesores
+CREATE TABLE asesores (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    correo VARCHAR(100) NOT NULL UNIQUE,
+    clave VARCHAR(255) NOT NULL,
+    nombre VARCHAR(100) NOT NULL,
+    rol_id INT,
+    FOREIGN KEY (rol_id) REFERENCES rol(id)
+);
+
+-- Tabla de usuarios (incluye estudiantes y administradores, con referencia a asesores)
+CREATE TABLE usuarios (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    correo VARCHAR(100) NOT NULL UNIQUE,
+    clave VARCHAR(255) NOT NULL,
+    nombre VARCHAR(100) NOT NULL,
+    id_asesor INT,
+    carrera VARCHAR(100),
+    grado INT,
+    grupo VARCHAR(10),
+    turno ENUM('matutino', 'vespertino'),
+    rol_id INT,
+    FOREIGN KEY (id_asesor) REFERENCES asesores(id),
+    FOREIGN KEY (rol_id) REFERENCES rol(id)
+);
+
+-- Tabla de revisiones del asesor
+CREATE TABLE revisiones_asesor (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    id_alumno INT NOT NULL,
+    id_asesor INT NOT NULL,
+    semana INT NOT NULL,
+    calificacion DECIMAL(4, 2),
+    comentario TEXT,
+    FOREIGN KEY (id_alumno) REFERENCES usuarios(id),
+    FOREIGN KEY (id_asesor) REFERENCES asesores(id)
+);
+
+-- Insertar un administrador en la tabla usuarios
+INSERT INTO usuarios (correo, clave, nombre, rol_id)
+VALUES ('admin@example.com', 'admin123', 'Administrador', 
+        (SELECT id FROM rol WHERE nombre_rol = 'admin'));
+
+-- Insertar un asesor en la tabla asesores
+INSERT INTO asesores (correo, clave, nombre, rol_id)
+VALUES ('asesor@example.com', 'asesor123', 'Asesor', 
+        (SELECT id FROM rol WHERE nombre_rol = 'asesor'));
+
+-- Insertar un usuario (estudiante) en la tabla usuarios con referencia a un asesor
+INSERT INTO usuarios (correo, clave, nombre, id_asesor, carrera, grado, grupo, turno, rol_id)
+VALUES ('usuario@example.com', 'usuario123', 'Estudiante', 
+        (SELECT id FROM asesores WHERE correo = 'asesor@example.com'), 
+        'IDGS', 10, 'A', 'vespertino', 
+        (SELECT id FROM rol WHERE nombre_rol = 'estudiante'));
+        
+-- Insertar una revisión en la tabla revisiones_asesor
+INSERT INTO revisiones_asesor (id_alumno, id_asesor, semana, calificacion, comentario)
+VALUES (
+    (SELECT id FROM usuarios WHERE correo = 'usuario@example.com'),  -- ID del estudiante
+    (SELECT id FROM asesores WHERE correo = 'asesor@example.com'),   -- ID del asesor
+    1,  -- Semana de la revisión
+    8.5,  -- Calificación de la revisión
+    'Buen desempeño, necesita mejorar en puntualidad.'  -- Comentario
+);
+
+SELECT*FROM revisiones_asesor;
+SELECT*FROM usuarios;
+SELECT*FROM asesores;
