@@ -11,7 +11,7 @@ try {
         exit;
     }
 
-    // Recibir datos de POST (los valores de ejemplo puedes reemplazarlos en producción)
+
     $semana = $_POST['semana'] ?? 3;
     $calificacion = $_POST['calificacion'] ?? 10;
     $comentario = $_POST['comentario'] ?? 'bien';
@@ -22,7 +22,7 @@ try {
         exit;
     }
 
-    // Insertar la calificación en la base de datos
+   
     $sql = "INSERT INTO revisiones_asesor (id_alumno, id_asesor, semana, calificacion, comentario) 
             VALUES (:id_alumno, :id_asesor, :semana, :calificacion, :comentario)";
     $stmt = $conexion->prepare($sql);

@@ -1,8 +1,8 @@
 <?php
-$host = 'localhost';       // Cambia esto si usas otro host
-$dbname = 'utesis';        // Nombre de la base de datos
-$username = 'root';        // Usuario de la base de datos
-$password = '';            // Contraseña del usuario
+$host = 'localhost';       
+$dbname = 'utesis';        
+$username = 'root';       
+$password = '';          
 
 try {
     $conexion = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8", $username, $password);

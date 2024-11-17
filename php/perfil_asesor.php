@@ -2,7 +2,7 @@
 require_once 'conexion.php';
 
 try {
-    $id_asesor = $_SESSION['id']; // Asegúrate de usar un valor válido o recibir el ID del asesor de alguna manera
+    $id_asesor = $_SESSION['id']; 
 
     $stmt = $conexion->prepare("SELECT nombre, correo, clave FROM asesores WHERE id = :id_asesor");
     $stmt->bindValue(':id_asesor', $id_asesor, PDO::PARAM_INT); // Correcto para PDO
